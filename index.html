@@ -6,481 +6,73 @@
 <title>即時醫療傳譯 · MedInterpret</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+TC:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap');
-
   :root {
-    --bg: #070b12;
-    --surface: #0d1520;
-    --surface2: #111e2e;
-    --border: #1a2d45;
-    --accent: #00d4ff;
-    --accent2: #0066ff;
-    --green: #00e5a0;
-    --amber: #ffb347;
-    --red: #ff4d6a;
-    --text: #e8f0fa;
-    --muted: #5a7090;
-    --sub: #8aa5c0;
+    --bg:#070b12;--surface:#0d1520;--surface2:#111e2e;--border:#1a2d45;
+    --accent:#00d4ff;--accent2:#0066ff;--green:#00e5a0;--amber:#ffb347;
+    --red:#ff4d6a;--text:#e8f0fa;--muted:#5a7090;--sub:#8aa5c0;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', 'Noto Sans TC', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* HEADER */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 28px;
-    border-bottom: 1px solid var(--border);
-    background: var(--surface);
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-
-  .logo-text {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    color: var(--text);
-  }
-
-  .logo-text span { color: var(--accent); }
-
-  .header-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    color: var(--muted);
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--muted);
-  }
-  .dot.live { background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 1.5s infinite; }
-  .dot.listening { background: var(--red); box-shadow: 0 0 8px var(--red); animation: pulse 0.8s infinite; }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  /* MAIN LAYOUT */
-  main {
-    flex: 1;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    gap: 0;
-    padding: 20px;
-    max-width: 1100px;
-    width: 100%;
-    margin: 0 auto;
-  }
-
-  /* CONTROLS */
-  .controls {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-
-  .mode-label {
-    font-size: 11px;
-    font-family: 'IBM Plex Mono', monospace;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-right: 4px;
-  }
-
-  .mode-btn {
-    padding: 8px 18px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--sub);
-    border-radius: 6px;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .mode-btn:hover { border-color: var(--accent); color: var(--text); }
-  .mode-btn.active {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    border-color: transparent;
-    color: #fff;
-    font-weight: 500;
-  }
-
-  .divider-v {
-    width: 1px; height: 24px;
-    background: var(--border);
-    margin: 0 4px;
-  }
-
-  .mic-btn {
-    margin-left: auto;
-    padding: 10px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .mic-btn.start {
-    background: linear-gradient(135deg, var(--green), #00b87a);
-    color: #001a0f;
-  }
-
-  .mic-btn.stop {
-    background: linear-gradient(135deg, var(--red), #cc2244);
-    color: #fff;
-    animation: mic-glow 1.5s infinite;
-  }
-
-  @keyframes mic-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,77,106,0.3); }
-    50% { box-shadow: 0 0 0 8px rgba(255,77,106,0); }
-  }
-
-  .mic-btn:hover { transform: translateY(-1px); }
-
-  /* DISPLAY AREA */
-  .display-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    min-height: 400px;
-  }
-
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .panel-header {
-    padding: 12px 18px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--surface2);
-  }
-
-  .panel-tag {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    padding: 3px 8px;
-    border-radius: 4px;
-  }
-
-  .tag-source { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
-  .tag-translation { background: rgba(0,229,160,0.1); color: var(--green); border: 1px solid rgba(0,229,160,0.2); }
-
-  .panel-lang {
-    font-size: 12px;
-    color: var(--muted);
-    margin-left: auto;
-    font-family: 'IBM Plex Mono', monospace;
-  }
-
-  .panel-body {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    scroll-behavior: smooth;
-  }
-
-  /* TRANSCRIPT ITEMS */
-  .transcript-item {
-    margin-bottom: 20px;
-    animation: fadeIn 0.3s ease;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .transcript-time {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .transcript-text {
-    font-size: 18px;
-    line-height: 1.7;
-    color: var(--text);
-    font-family: 'Noto Sans TC', 'Inter', sans-serif;
-    font-weight: 400;
-  }
-
-  .transcript-text.interim {
-    color: var(--sub);
-    font-style: italic;
-  }
-
-  .translation-text {
-    font-size: 18px;
-    line-height: 1.7;
-    color: var(--text);
-    font-family: 'Noto Sans TC', 'Inter', sans-serif;
-  }
-
-  .translation-text.loading {
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .spinner {
-    width: 14px; height: 14px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    flex-shrink: 0;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* MEDICAL TERM HIGHLIGHT */
-  .med-term {
-    background: rgba(255,179,71,0.12);
-    color: var(--amber);
-    border-bottom: 1px dotted var(--amber);
-    padding: 0 2px;
-    border-radius: 2px;
-    cursor: help;
-    position: relative;
-  }
-
-  /* EMPTY STATE */
-  .empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    gap: 12px;
-    color: var(--muted);
-    text-align: center;
-    padding: 40px;
-  }
-
-  .empty-icon {
-    font-size: 40px;
-    opacity: 0.4;
-  }
-
-  .empty-text {
-    font-size: 14px;
-    line-height: 1.6;
-  }
-
-  /* BOTTOM SUBTITLE BAR */
-  .subtitle-bar {
-    margin-top: 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 24px;
-    min-height: 72px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .subtitle-bar::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: linear-gradient(to bottom, var(--accent), var(--green));
-    border-radius: 3px 0 0 3px;
-  }
-
-  .subtitle-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-    white-space: nowrap;
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-  }
-
-  .subtitle-content {
-    flex: 1;
-  }
-
-  .subtitle-original {
-    font-size: 13px;
-    color: var(--sub);
-    margin-bottom: 4px;
-    font-family: 'Noto Sans TC', sans-serif;
-    min-height: 18px;
-  }
-
-  .subtitle-translated {
-    font-size: 22px;
-    font-weight: 500;
-    color: var(--text);
-    font-family: 'Noto Sans TC', 'Inter', sans-serif;
-    min-height: 32px;
-    line-height: 1.4;
-  }
-
-  /* WAVEFORM */
-  .waveform {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    height: 40px;
-    padding: 0 8px;
-  }
-
-  .wave-bar {
-    width: 3px;
-    background: var(--accent);
-    border-radius: 2px;
-    transition: height 0.1s;
-    opacity: 0.6;
-  }
-
-  /* SCROLL */
-  .panel-body::-webkit-scrollbar { width: 4px; }
-  .panel-body::-webkit-scrollbar-track { background: transparent; }
-  .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  /* SETTINGS ROW */
-  .settings-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-    padding: 10px 14px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 12px;
-    color: var(--sub);
-    flex-wrap: wrap;
-  }
-
-  .settings-row label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: pointer;
-  }
-
-  .settings-row input[type="checkbox"] {
-    accent-color: var(--accent);
-    width: 14px; height: 14px;
-  }
-
-  .clear-btn {
-    margin-left: auto;
-    padding: 4px 12px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--muted);
-    font-size: 11px;
-    cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
-    transition: all 0.2s;
-  }
-
-  .clear-btn:hover { border-color: var(--red); color: var(--red); }
-
-  /* RESPONSIVE */
-  @media (max-width: 700px) {
-    .display-grid { grid-template-columns: 1fr; }
-    .subtitle-translated { font-size: 18px; }
-    main { padding: 12px; }
-  }
-
-  /* COPY TOAST */
-  .toast {
-    position: fixed;
-    bottom: 30px; right: 30px;
-    background: var(--green);
-    color: #001a0f;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s;
-    pointer-events: none;
-    z-index: 100;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  .error-banner {
-    background: rgba(255,77,106,0.1);
-    border: 1px solid rgba(255,77,106,0.3);
-    color: var(--red);
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    margin-bottom: 14px;
-    display: none;
-  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter','Noto Sans TC',sans-serif;min-height:100vh;display:flex;flex-direction:column;}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--surface);}
+  .logo{display:flex;align-items:center;gap:10px;}
+  .logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+  .logo-text{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;letter-spacing:0.05em;}
+  .logo-text span{color:var(--accent);}
+  .header-status{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);}
+  .dot.listening{background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 0.8s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  main{flex:1;display:flex;flex-direction:column;padding:16px;max-width:1100px;width:100%;margin:0 auto;gap:14px;}
+  .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .mode-label{font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+  .mode-btn{padding:8px 16px;border:1px solid var(--border);background:transparent;color:var(--sub);border-radius:6px;font-family:'Noto Sans TC',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s;}
+  .mode-btn.active{background:linear-gradient(135deg,var(--accent2),var(--accent));border-color:transparent;color:#fff;font-weight:500;}
+  .mic-btn{margin-left:auto;padding:10px 24px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all 0.2s;font-family:'Inter',sans-serif;}
+  .mic-btn.start{background:linear-gradient(135deg,var(--green),#00b87a);color:#001a0f;}
+  .mic-btn.stop{background:linear-gradient(135deg,var(--red),#cc2244);color:#fff;animation:mic-glow 1.5s infinite;}
+  @keyframes mic-glow{0%,100%{box-shadow:0 0 0 0 rgba(255,77,106,0.3)}50%{box-shadow:0 0 0 8px rgba(255,77,106,0)}}
+  .settings-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--sub);flex-wrap:wrap;}
+  .settings-row label{display:flex;align-items:center;gap:6px;cursor:pointer;}
+  .settings-row input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;}
+  .clear-btn{margin-left:auto;padding:4px 12px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;cursor:pointer;font-family:'IBM Plex Mono',monospace;transition:all 0.2s;}
+  .clear-btn:hover{border-color:var(--red);color:var(--red);}
+  .error-banner{background:rgba(255,77,106,0.1);border:1px solid rgba(255,77,106,0.3);color:var(--red);padding:10px 16px;border-radius:8px;font-size:13px;display:none;}
+  .display-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:320px;}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;}
+  .panel-header{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface2);}
+  .panel-tag{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;padding:3px 8px;border-radius:4px;}
+  .tag-source{background:rgba(0,212,255,0.1);color:var(--accent);border:1px solid rgba(0,212,255,0.2);}
+  .tag-translation{background:rgba(0,229,160,0.1);color:var(--green);border:1px solid rgba(0,229,160,0.2);}
+  .panel-lang{font-size:12px;color:var(--muted);margin-left:auto;font-family:'IBM Plex Mono',monospace;}
+  .panel-body{flex:1;padding:16px;overflow-y:auto;scroll-behavior:smooth;}
+  .panel-body::-webkit-scrollbar{width:4px;}
+  .panel-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .transcript-item{margin-bottom:16px;animation:fadeIn 0.3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  .transcript-time{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px;}
+  .transcript-text{font-size:17px;line-height:1.7;color:var(--text);font-family:'Noto Sans TC','Inter',sans-serif;}
+  .transcript-text.interim{color:var(--sub);font-style:italic;}
+  .translation-text{font-size:17px;line-height:1.7;color:var(--text);font-family:'Noto Sans TC','Inter',sans-serif;}
+  .translation-text.loading{color:var(--muted);display:flex;align-items:center;gap:6px;}
+  .spinner{width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .med-term{background:rgba(255,179,71,0.12);color:var(--amber);border-bottom:1px dotted var(--amber);padding:0 2px;border-radius:2px;}
+  .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--muted);text-align:center;padding:30px;}
+  .empty-icon{font-size:36px;opacity:0.4;}
+  .empty-text{font-size:13px;line-height:1.6;}
+  /* SUBTITLE BAR */
+  .subtitle-bar{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;}
+  .subtitle-bar::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--accent),var(--green));border-radius:3px 0 0 3px;}
+  .subtitle-label{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);white-space:nowrap;writing-mode:vertical-rl;transform:rotate(180deg);}
+  .subtitle-content{flex:1;min-width:0;}
+  .subtitle-original{font-size:12px;color:var(--sub);margin-bottom:3px;min-height:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .subtitle-translated{font-size:20px;font-weight:500;color:var(--text);min-height:28px;line-height:1.4;font-family:'Noto Sans TC','Inter',sans-serif;}
+  .waveform{display:flex;align-items:center;gap:3px;height:36px;flex-shrink:0;}
+  .wave-bar{width:3px;background:var(--accent);border-radius:2px;transition:height 0.1s;opacity:0.6;}
+  @media(max-width:650px){.display-grid{grid-template-columns:1fr}.subtitle-translated{font-size:17px}main{padding:10px}}
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">
     <div class="logo-icon">🏥</div>
@@ -495,29 +87,26 @@
 <main>
   <div class="controls">
     <span class="mode-label">模式</span>
-    <button class="mode-btn active" id="btn-zh-en" onclick="setMode('zh-en')">粵語 / 普通話 → English</button>
+    <button class="mode-btn active" id="btn-zh-en" onclick="setMode('zh-en')">粵語/普通話 → English</button>
     <button class="mode-btn" id="btn-en-zh" onclick="setMode('en-zh')">English → 中文</button>
-    <div class="divider-v"></div>
     <button class="mic-btn start" id="micBtn" onclick="toggleListening()">
-      <span>🎤</span> <span id="micLabel">開始傳譯</span>
+      <span>🎤</span><span id="micLabel">開始傳譯</span>
     </button>
   </div>
 
   <div class="settings-row">
-    <label><input type="checkbox" id="chkMedHighlight" checked> 醫學術語標示</label>
-    <label><input type="checkbox" id="chkSubtitleBar" checked> 字幕欄</label>
-    <label><input type="checkbox" id="chkAutoCopy"> 自動複製譯文</label>
-    <span style="color:var(--muted); font-size:11px; font-family:'IBM Plex Mono',monospace;">● 醫學詞彙強化模式已啟用</span>
+    <label><input type="checkbox" id="chkMed" checked> 醫學術語標示</label>
+    <label><input type="checkbox" id="chkSub" checked> 字幕欄</label>
+    <span style="color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;">● 醫學詞彙強化</span>
     <button class="clear-btn" onclick="clearAll()">CLEAR</button>
   </div>
 
   <div id="errorBanner" class="error-banner"></div>
 
   <div class="display-grid">
-    <!-- SOURCE PANEL -->
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-tag tag-source" id="sourceTag">語音輸入</span>
+        <span class="panel-tag tag-source">語音輸入</span>
         <span class="panel-lang" id="sourceLabel">粵語 / 普通話</span>
       </div>
       <div class="panel-body" id="sourceBody">
@@ -527,8 +116,6 @@
         </div>
       </div>
     </div>
-
-    <!-- TRANSLATION PANEL -->
     <div class="panel">
       <div class="panel-header">
         <span class="panel-tag tag-translation">即時譯文</span>
@@ -537,348 +124,280 @@
       <div class="panel-body" id="translationBody">
         <div class="empty-state" id="translationEmpty">
           <div class="empty-icon">📝</div>
-          <div class="empty-text">譯文將會在這裡顯示<br>醫學術語會自動加強</div>
+          <div class="empty-text">譯文將會在這裡顯示<br>醫學術語會自動標示</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SUBTITLE BAR -->
   <div class="subtitle-bar" id="subtitleBar">
     <div class="subtitle-label">字幕</div>
     <div class="subtitle-content">
-      <div class="subtitle-original" id="subtitleOriginal">—</div>
-      <div class="subtitle-translated" id="subtitleTranslated">等待語音輸入…</div>
+      <div class="subtitle-original" id="subOrig">—</div>
+      <div class="subtitle-translated" id="subTrans">等待語音輸入…</div>
     </div>
-    <div class="waveform" id="waveform">
-      <!-- bars injected by JS -->
-    </div>
+    <div class="waveform" id="waveform"></div>
   </div>
 </main>
 
-<div class="toast" id="toast">已複製！</div>
-
 <script>
-const CLAUDE_API = 'https://api.anthropic.com/v1/messages';
-
-// ─── STATE ───────────────────────────────────────────────
-let mode = 'zh-en'; // 'zh-en' | 'en-zh'
+const API = 'https://api.anthropic.com/v1/messages';
+let mode = 'zh-en';
 let recognition = null;
 let isListening = false;
-let pendingTranslation = null;
-let translationQueue = [];
-let isTranslating = false;
 let interimEl = null;
+let queue = [];
+let busy = false;
+let restartTimer = null;
 
-// ─── MODE ─────────────────────────────────────────────────
+// ── MODE ──────────────────────────────────────────────────
 function setMode(m) {
   mode = m;
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn-' + m.replace('-','-')).classList.add('active');
-  if (m === 'zh-en') {
-    document.getElementById('sourceLabel').textContent = '粵語 / 普通話';
-    document.getElementById('translationLabel').textContent = 'English';
-    document.getElementById('subtitleTranslated').textContent = '等待語音輸入…';
-  } else {
-    document.getElementById('sourceLabel').textContent = 'English';
-    document.getElementById('translationLabel').textContent = '中文譯文';
-    document.getElementById('subtitleTranslated').textContent = 'Waiting for speech…';
-  }
-  if (isListening) { stopListening(); setTimeout(startListening, 300); }
+  document.getElementById('btn-' + m).classList.add('active');
+  document.getElementById('sourceLabel').textContent = m === 'zh-en' ? '粵語 / 普通話' : 'English';
+  document.getElementById('translationLabel').textContent = m === 'zh-en' ? 'English' : '中文譯文';
+  document.getElementById('subTrans').textContent = m === 'zh-en' ? '等待語音輸入…' : 'Waiting for speech…';
+  if (isListening) { stopListening(); setTimeout(startListening, 400); }
 }
 
-// ─── SPEECH RECOGNITION ──────────────────────────────────
+// ── MIC ───────────────────────────────────────────────────
 function toggleListening() {
-  if (isListening) stopListening(); else startListening();
+  isListening ? stopListening() : startListening();
 }
 
 function startListening() {
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-    showError('您的瀏覽器不支援語音識別。請使用 Chrome 或 Edge。');
-    return;
-  }
-
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { showError('請使用 Chrome 或 Edge 瀏覽器'); return; }
+
   recognition = new SR();
   recognition.continuous = true;
   recognition.interimResults = true;
   recognition.lang = mode === 'zh-en' ? 'zh-HK' : 'en-US';
-  recognition.maxAlternatives = 1;
 
   recognition.onstart = () => {
     isListening = true;
-    setListeningUI(true);
+    setUI(true);
     hideError();
   };
 
-  recognition.onresult = (event) => {
-    let interim = '';
-    let final = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const t = event.results[i][0].transcript;
-      if (event.results[i].isFinal) { final += t; }
-      else { interim += t; }
+  recognition.onresult = (e) => {
+    let interim = '', final = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      e.results[i].isFinal ? (final += t) : (interim += t);
     }
-
-    // Update interim display
+    // show interim
     if (interimEl) interimEl.remove();
     if (interim) {
-      interimEl = document.createElement('div');
-      interimEl.className = 'transcript-item';
-      interimEl.innerHTML = `<div class="transcript-text interim">${interim}</div>`;
-      document.getElementById('sourceBody').appendChild(interimEl);
-      document.getElementById('subtitleOriginal').textContent = interim;
+      interimEl = mkEl('div', 'transcript-item',
+        '<div class="transcript-text interim">' + esc(interim) + '</div>');
+      sourceBody().appendChild(interimEl);
+      document.getElementById('subOrig').textContent = interim;
     }
-
+    // commit final
     if (final.trim()) {
       if (interimEl) { interimEl.remove(); interimEl = null; }
-      addSourceItem(final.trim());
-      document.getElementById('subtitleOriginal').textContent = final.trim();
-      queueTranslation(final.trim());
+      addSource(final.trim());
+      document.getElementById('subOrig').textContent = final.trim();
+      enqueue(final.trim());
     }
-
-    scrollPanels();
-    hideEmptyStates();
+    scroll(); hideEmpty();
   };
 
   recognition.onerror = (e) => {
-    if (e.error === 'no-speech') return;
-    if (e.error === 'aborted') return;
-    showError('語音識別錯誤: ' + e.error);
+    if (e.error === 'no-speech' || e.error === 'aborted') return;
+    showError('語音錯誤: ' + e.error);
   };
 
+  // stable restart — avoid rapid loop
   recognition.onend = () => {
-    if (isListening) { // auto-restart
-      try { recognition.start(); } catch(e) {}
-    }
+    if (!isListening) return;
+    clearTimeout(restartTimer);
+    restartTimer = setTimeout(() => {
+      if (!isListening) return;
+      try { recognition.start(); } catch (_) {}
+    }, 300);
   };
 
-  try { recognition.start(); } catch(e) { showError(e.message); }
+  try { recognition.start(); } catch (e) { showError(e.message); }
 }
 
 function stopListening() {
   isListening = false;
-  if (recognition) { recognition.abort(); recognition = null; }
-  setListeningUI(false);
+  clearTimeout(restartTimer);
+  if (recognition) { try { recognition.stop(); } catch (_) {} recognition = null; }
+  setUI(false);
 }
 
-function setListeningUI(on) {
+function setUI(on) {
   const btn = document.getElementById('micBtn');
-  const dot = document.getElementById('statusDot');
-  const txt = document.getElementById('statusText');
-
   if (on) {
     btn.className = 'mic-btn stop';
-    btn.innerHTML = '<span>⏹</span> <span id="micLabel">停止傳譯</span>';
-    dot.className = 'dot listening';
-    txt.textContent = '正在聆聽…';
-    startWaveform();
+    btn.innerHTML = '<span>⏹</span><span>停止傳譯</span>';
+    document.getElementById('statusDot').className = 'dot listening';
+    document.getElementById('statusText').textContent = '正在聆聽…';
+    startWave();
   } else {
     btn.className = 'mic-btn start';
-    btn.innerHTML = '<span>🎤</span> <span id="micLabel">開始傳譯</span>';
-    dot.className = 'dot';
-    txt.textContent = '待機中';
-    stopWaveform();
+    btn.innerHTML = '<span>🎤</span><span>開始傳譯</span>';
+    document.getElementById('statusDot').className = 'dot';
+    document.getElementById('statusText').textContent = '待機中';
+    stopWave();
   }
 }
 
-// ─── TRANSLATION QUEUE ───────────────────────────────────
-function queueTranslation(text) {
-  translationQueue.push(text);
-  processQueue();
-}
+// ── TRANSLATE QUEUE ───────────────────────────────────────
+function enqueue(text) { queue.push(text); drain(); }
 
-async function processQueue() {
-  if (isTranslating || translationQueue.length === 0) return;
-  isTranslating = true;
-  const text = translationQueue.shift();
-  await translate(text);
-  isTranslating = false;
-  processQueue();
+async function drain() {
+  if (busy || !queue.length) return;
+  busy = true;
+  await translate(queue.shift());
+  busy = false;
+  drain();
 }
 
 async function translate(text) {
-  const loadingEl = addTranslationLoading();
-
-  const systemPrompt = mode === 'zh-en'
-    ? `You are a professional medical interpreter specialising in Cantonese and Mandarin to English translation.
-Rules:
-1. Translate the input to natural, accurate English.
-2. Preserve all medical terminology with maximum accuracy. Common terms: 心臟病=heart disease, 血壓=blood pressure, 糖尿病=diabetes mellitus, 癌症=cancer/malignancy, 手術=surgery/operation, 藥物=medication, 敏感=allergy, 發燒=fever, 痛症=pain syndrome, 腦中風=stroke, 心跳=heart rate/palpitation, 血糖=blood glucose, 腫瘤=tumor, 化療=chemotherapy, X光=X-ray, 消化=digestion, 腎=kidney, 肝=liver, 肺=lung, 骨折=fracture, 抗生素=antibiotics, 止痛藥=analgesic/painkiller.
-3. For Cantonese: 唔舒服=unwell, 頭暈=dizziness/vertigo, 作嘔=nausea.
-4. Output ONLY the English translation. No explanation. No brackets. Just the translation.`
-    : `You are a professional medical interpreter specialising in English to Traditional Chinese (Hong Kong) translation.
-Rules:
-1. Translate the input to natural Traditional Chinese (Hong Kong usage).
-2. Preserve all medical terminology accurately. Common terms: heart disease=心臟病, blood pressure=血壓, diabetes=糖尿病, cancer=癌症, surgery=手術/外科手術, medication=藥物, allergy=敏感/過敏, fever=發燒, stroke=腦中風, heart rate=心率, blood glucose=血糖, tumor=腫瘤, chemotherapy=化療, X-ray=X光, fracture=骨折, antibiotics=抗生素, analgesic=止痛藥, diagnosis=診斷, prescription=處方, inflammation=炎症, infection=感染, chronic=慢性, acute=急性, biopsy=活檢, MRI=磁力共振, CT scan=電腦掃描.
-3. Output ONLY the Chinese translation. No explanation. Just the translation.`;
-
+  const loader = addLoader();
+  const sys = mode === 'zh-en'
+    ? 'You are a professional medical interpreter. Translate the Cantonese or Mandarin input into accurate English. Preserve all medical terminology precisely. Output ONLY the English translation, no explanation.'
+    : 'You are a professional medical interpreter. Translate the English input into accurate Traditional Chinese (Hong Kong). Preserve all medical terminology precisely. Output ONLY the Chinese translation, no explanation.';
   try {
-    const resp = await fetch(CLAUDE_API, {
+    const r = await fetch(API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1000,
-        system: systemPrompt,
+        system: sys,
         messages: [{ role: 'user', content: text }]
       })
     });
-
-    const data = await resp.json();
-    const translated = data.content?.[0]?.text?.trim() || '（翻譯失敗）';
-    
-    loadingEl.remove();
-    const finalEl = addTranslationItem(translated);
-
-    // Update subtitle bar
-    document.getElementById('subtitleTranslated').textContent = translated;
-
-    if (document.getElementById('chkAutoCopy').checked) {
-      navigator.clipboard?.writeText(translated).catch(() => {});
-      showToast();
-    }
-
+    const d = await r.json();
+    const out = d.content?.[0]?.text?.trim() || '（翻譯失敗）';
+    loader.remove();
+    addTranslation(out);
+    document.getElementById('subTrans').textContent = out;
   } catch (e) {
-    loadingEl.remove();
-    addTranslationItem('⚠ 翻譯錯誤: ' + e.message);
-    document.getElementById('subtitleTranslated').textContent = '翻譯錯誤';
+    loader.remove();
+    addTranslation('⚠ 錯誤: ' + e.message);
   }
 }
 
-// ─── DOM HELPERS ──────────────────────────────────────────
-function now() {
+// ── DOM HELPERS ───────────────────────────────────────────
+const sourceBody = () => document.getElementById('sourceBody');
+const transBody  = () => document.getElementById('translationBody');
+
+function ts() {
   return new Date().toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
-function addSourceItem(text) {
-  const div = document.createElement('div');
-  div.className = 'transcript-item';
-  div.innerHTML = `
-    <div class="transcript-time">${now()}</div>
-    <div class="transcript-text">${escHtml(text)}</div>`;
-  document.getElementById('sourceBody').appendChild(div);
-  scrollPanels();
+function mkEl(tag, cls, html) {
+  const el = document.createElement(tag);
+  el.className = cls;
+  el.innerHTML = html;
+  return el;
 }
 
-function addTranslationLoading() {
-  const div = document.createElement('div');
-  div.className = 'transcript-item';
-  div.innerHTML = `
-    <div class="transcript-time">${now()}</div>
-    <div class="translation-text loading"><div class="spinner"></div> 正在傳譯…</div>`;
-  document.getElementById('translationBody').appendChild(div);
-  scrollPanels();
-  return div;
+function addSource(text) {
+  sourceBody().appendChild(mkEl('div', 'transcript-item',
+    '<div class="transcript-time">' + ts() + '</div>' +
+    '<div class="transcript-text">' + esc(text) + '</div>'));
+  scroll();
 }
 
-function addTranslationItem(text) {
-  const highlightMed = document.getElementById('chkMedHighlight').checked;
-  const div = document.createElement('div');
-  div.className = 'transcript-item';
-  div.innerHTML = `
-    <div class="transcript-time">${now()}</div>
-    <div class="translation-text">${highlightMed ? highlightMedical(text) : escHtml(text)}</div>`;
-  document.getElementById('translationBody').appendChild(div);
-  scrollPanels();
-  return div;
+function addLoader() {
+  const el = mkEl('div', 'transcript-item',
+    '<div class="transcript-time">' + ts() + '</div>' +
+    '<div class="translation-text loading"><div class="spinner"></div> 正在傳譯…</div>');
+  transBody().appendChild(el);
+  scroll();
+  return el;
 }
 
-function hideEmptyStates() {
+function addTranslation(text) {
+  const hl = document.getElementById('chkMed').checked;
+  transBody().appendChild(mkEl('div', 'transcript-item',
+    '<div class="transcript-time">' + ts() + '</div>' +
+    '<div class="translation-text">' + (hl ? highlight(text) : esc(text)) + '</div>'));
+  scroll();
+}
+
+function hideEmpty() {
   document.getElementById('sourceEmpty').style.display = 'none';
   document.getElementById('translationEmpty').style.display = 'none';
 }
 
-function scrollPanels() {
-  const sb = document.getElementById('sourceBody');
-  const tb = document.getElementById('translationBody');
-  sb.scrollTop = sb.scrollHeight;
-  tb.scrollTop = tb.scrollHeight;
+function scroll() {
+  [sourceBody(), transBody()].forEach(el => { el.scrollTop = el.scrollHeight; });
 }
 
 function clearAll() {
-  document.getElementById('sourceBody').innerHTML = '<div class="empty-state" id="sourceEmpty"><div class="empty-icon">🎙️</div><div class="empty-text">按「開始傳譯」後開始說話<br>支援廣東話、普通話、英語</div></div>';
-  document.getElementById('translationBody').innerHTML = '<div class="empty-state" id="translationEmpty"><div class="empty-icon">📝</div><div class="empty-text">譯文將會在這裡顯示<br>醫學術語會自動加強</div></div>';
-  document.getElementById('subtitleOriginal').textContent = '—';
-  document.getElementById('subtitleTranslated').textContent = mode === 'zh-en' ? '等待語音輸入…' : 'Waiting for speech…';
+  sourceBody().innerHTML = '<div class="empty-state" id="sourceEmpty"><div class="empty-icon">🎙️</div><div class="empty-text">按「開始傳譯」後開始說話</div></div>';
+  transBody().innerHTML  = '<div class="empty-state" id="translationEmpty"><div class="empty-icon">📝</div><div class="empty-text">譯文將會在這裡顯示</div></div>';
+  document.getElementById('subOrig').textContent  = '—';
+  document.getElementById('subTrans').textContent = mode === 'zh-en' ? '等待語音輸入…' : 'Waiting for speech…';
   interimEl = null;
 }
 
-// ─── MEDICAL HIGHLIGHT ───────────────────────────────────
-const medTermsEN = ['hypertension','hypotension','diabetes','mellitus','carcinoma','malignancy','myocardial','infarction','cerebrovascular','stroke','hemorrhage','ischemia','tachycardia','bradycardia','arrhythmia','fibrillation','thrombosis','embolism','aneurysm','sepsis','pneumonia','tuberculosis','nephritis','hepatitis','pancreatitis','appendicitis','cholecystitis','edema','ascites','jaundice','cyanosis','dyspnea','tachypnea','orthopnea','anemia','leukemia','lymphoma','biopsy','laparoscopy','endoscopy','colonoscopy','echocardiogram','electrocardiogram','MRI','CT scan','ultrasound','chemotherapy','radiotherapy','immunotherapy','antibiotics','analgesic','anticoagulant','corticosteroid','diuretic','antihistamine','bronchodilator','vasodilator','dialysis','intubation','ventilator','ICU','CPR'];
+// ── MEDICAL HIGHLIGHT ─────────────────────────────────────
+const MED_EN = ['hypertension','hypotension','diabetes','mellitus','carcinoma','malignancy','myocardial','infarction','cerebrovascular','stroke','hemorrhage','ischemia','tachycardia','bradycardia','arrhythmia','fibrillation','thrombosis','embolism','aneurysm','sepsis','pneumonia','tuberculosis','nephritis','hepatitis','pancreatitis','edema','ascites','jaundice','cyanosis','dyspnea','anemia','leukemia','lymphoma','biopsy','laparoscopy','endoscopy','echocardiogram','MRI','chemotherapy','radiotherapy','immunotherapy','antibiotics','analgesic','anticoagulant','corticosteroid','diuretic','dialysis','intubation','ventilator','ICU','CPR'];
+const MED_ZH = ['心臟病','血壓','高血壓','低血壓','糖尿病','癌症','腫瘤','惡性','手術','外科','藥物','過敏','敏感','發燒','頭暈','腦中風','心律','心跳','血糖','化療','放療','X光','磁力共振','電腦掃描','骨折','抗生素','止痛藥','抗凝血','消炎藥','利尿藥','腎衰竭','肝衰竭','肺炎','胰臟','膽囊','闌尾','敗血症','結核','腎炎','肝炎','胰腺炎','水腫','黃疸','呼吸困難','貧血','白血病','淋巴瘤','活檢','腹腔鏡','內窺鏡','超聲波','透析','插管','呼吸機','深切治療','心肺復甦','處方','診斷','症狀','急性','慢性','感染','炎症'];
 
-const medTermsZH = ['心臟病','血壓','高血壓','低血壓','糖尿病','癌症','腫瘤','惡性','手術','外科','藥物','過敏','敏感','發燒','頭暈','腦中風','心律','心跳','血糖','化療','放療','X光','磁力共振','電腦掃描','骨折','抗生素','止痛藥','抗凝血','消炎藥','利尿藥','腎','肝','肺','胰臟','膽囊','闌尾','敗血症','肺炎','結核','腎炎','肝炎','胰腺炎','水腫','黃疸','呼吸困難','貧血','白血病','淋巴瘤','活檢','腹腔鏡','內窺鏡','超聲波','透析','插管','呼吸機','深切治療','心肺復甦','處方','診斷','症狀','急性','慢性','感染','炎症'];
-
-function highlightMedical(text) {
-  let result = escHtml(text);
-  const terms = mode === 'zh-en' ? medTermsEN : medTermsZH;
-  terms.forEach(term => {
-    const re = new RegExp(escReg(term), 'gi');
-    result = result.replace(re, m => `<span class="med-term" title="Medical term: ${m}">${m}</span>`);
+function highlight(text) {
+  let r = esc(text);
+  (mode === 'zh-en' ? MED_EN : MED_ZH).forEach(t => {
+    const re = new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'gi');
+    r = r.replace(re, m => '<span class="med-term">' + m + '</span>');
   });
-  return result;
+  return r;
 }
 
-function escHtml(s) {
+function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function escReg(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-}
 
-// ─── WAVEFORM ────────────────────────────────────────────
-let waveInterval = null;
-
-function buildWaveform() {
+// ── WAVEFORM ──────────────────────────────────────────────
+let waveTimer = null;
+function buildWave() {
   const wf = document.getElementById('waveform');
   wf.innerHTML = '';
   for (let i = 0; i < 12; i++) {
     const b = document.createElement('div');
-    b.className = 'wave-bar';
-    b.style.height = '4px';
+    b.className = 'wave-bar'; b.style.height = '4px';
     wf.appendChild(b);
   }
 }
-
-function startWaveform() {
-  buildWaveform();
-  waveInterval = setInterval(() => {
-    if (!isListening) return;
+function startWave() {
+  buildWave();
+  waveTimer = setInterval(() => {
     document.querySelectorAll('.wave-bar').forEach(b => {
-      const h = Math.random() * 32 + 4;
-      b.style.height = h + 'px';
+      b.style.height = (Math.random() * 30 + 4) + 'px';
     });
-  }, 120);
+  }, 130);
 }
-
-function stopWaveform() {
-  clearInterval(waveInterval);
+function stopWave() {
+  clearInterval(waveTimer);
   document.querySelectorAll('.wave-bar').forEach(b => { b.style.height = '4px'; });
 }
 
-// ─── UI HELPERS ───────────────────────────────────────────
+// ── ERROR ─────────────────────────────────────────────────
 function showError(msg) {
   const el = document.getElementById('errorBanner');
-  el.textContent = '⚠ ' + msg;
-  el.style.display = 'block';
+  el.textContent = '⚠ ' + msg; el.style.display = 'block';
 }
-function hideError() {
-  document.getElementById('errorBanner').style.display = 'none';
-}
-function showToast() {
-  const t = document.getElementById('toast');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1800);
-}
+function hideError() { document.getElementById('errorBanner').style.display = 'none'; }
 
-// ─── SUBTITLE BAR TOGGLE ─────────────────────────────────
-document.getElementById('chkSubtitleBar').addEventListener('change', e => {
+// ── SUBTITLE TOGGLE ───────────────────────────────────────
+document.getElementById('chkSub').addEventListener('change', e => {
   document.getElementById('subtitleBar').style.display = e.target.checked ? 'flex' : 'none';
 });
 
-// INIT
-buildWaveform();
+buildWave();
 </script>
 </body>
 </html>
-
